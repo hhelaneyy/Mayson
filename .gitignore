@@ -1,5 +1,5 @@
 /config.json
 /core
-/Molzy.db
+*.db
 /venv
 /__pycache__
