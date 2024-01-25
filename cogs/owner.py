@@ -68,7 +68,6 @@ class OwnerCog(commands.Cog):
         
         new_warning_count = 0
 
-        # Используем контекстный менеджер для работы с базой данных
         with sqlite3.connect('Mayson.db') as conn:
             cursor = conn.cursor()
 
