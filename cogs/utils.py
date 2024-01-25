@@ -9,7 +9,7 @@ from disnake import ui
 from typing import List
 import sqlite3
 from googletrans import Translator
-from core.embeds import descriptions, errors
+from core.utilities.embeds import descriptions, errors
 
 conn = sqlite3.connect('Mayson.db')
 cursor = conn.cursor()
@@ -64,7 +64,7 @@ class UtilsCog(commands.Cog):
             about_bot = (
                 f"🧊 | Язык программирования: __**Python {platform.python_version()}**__",
                 f"💽 | Платформа: __**{platform.platform()}**__",
-                f'🔄️ | Версия обновления: __**Бета 2.0**__',
+                f'🔄️ | Версия обновления: __**Бета 2.0.1**__',
                 f"🔖 | Статус: __**В разработке...**__",
                 f"🏂🏻 | Задержка: __**{round(self.bot.latency * float(1000))}мс.**__",
             )
@@ -146,7 +146,7 @@ class UtilsCog(commands.Cog):
                 f'Ботов: **{len(([member for member in guild.members if member.bot]))}**',
             )
 
-            emb = disnake.Embed(title=f"Информация о сервере {guild.name}", description=guild.description or 'Нету описания?(((', color=disnake.Color.random())
+            emb = disnake.Embed(title=f"Информация о сервере {guild.name}", description=guild.description or 'Описание отсутствует.', color=disnake.Color.random())
             emb.add_field(name="> О сервере:", value='\n'.join(about_guild), inline=False)
             emb.add_field(name="> Роли:", value='\n'.join(roles), inline=False)
             emb.add_field(name="> Каналы и Бусты:", value='\n'.join(channels_and_boosts), inline=False)
@@ -214,7 +214,7 @@ class UtilsCog(commands.Cog):
         emb.set_thumbnail(url=user.avatar)
         await ctx.reply(embed=emb)
 
-    @commands.command(description="Информация об участнике.")
+    @commands.command(description="Информация об участнике сервера.")
     async def profile(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member | disnake.User = None):
         author = inter.author
         if user is None:
@@ -293,7 +293,7 @@ class UtilsCog(commands.Cog):
 
             view.bot = self.bot
 
-        emb = disnake.Embed(description=user.activity or 'Нет активности?((', color=disnake.Color.random())
+        emb = disnake.Embed(description=user.activity or 'Активность отсутвует.', color=disnake.Color.random())
         emb.add_field(name="> Общая информация", value='\n'.join(all_info), inline=False)
         emb.add_field(name="> Информация об участнике", value='\n'.join(user_info), inline=False)
         emb.add_field(name="> Прочая информация", value='\n'.join(other_info), inline=False)

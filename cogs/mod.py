@@ -8,7 +8,7 @@ from disnake.ext import commands
 from datetime import timedelta
 from typing import Union
 import sqlite3
-from core.embeds import descriptions, errors
+from core.utilities.embeds import descriptions, errors
 
 conn = sqlite3.connect('Mayson.db')
 cursor = conn.cursor()
@@ -86,20 +86,22 @@ class ModernCog(commands.Cog):
         wm.add_field(name="    **Продолжительность наказания:**", value=f'{time} {unit_name}')
         wm.add_field(name="    **Причина:**", value=f"{reason or 'Причина не указана.'}")
         wm.set_footer(text="Справедливость восторжествовала!", icon_url=self.bot.user.avatar)
-
-        w = disnake.Embed(title=f'Вы были замьючены на сервере {inter.guild.name}', color=disnake.Color.red())
-        w.add_field(name="    **Администратор:**", value=inter.author.mention)
-        w.add_field(name="    **Продолжительность наказания:**", value=f'{time} {unit_name}')
-        w.add_field(name="    **Причина:**", value=f"{reason or 'Причина не указана.'}")
-
-        await user.send(embed=w)
         await inter.response.send_message(embed=wm)
+
+        try:
+            w = disnake.Embed(title=f'Вы были замьючены на сервере {inter.guild.name}', color=disnake.Color.red())
+            w.add_field(name="    **Администратор:**", value=inter.author.mention)
+            w.add_field(name="    **Продолжительность наказания:**", value=f'{time} {unit_name}')
+            w.add_field(name="    **Причина:**", value=f"{reason or 'Причина не указана.'}")
+            await user.send(embed=w)
+        except:
+            pass
 
     @commands.slash_command(name='warn', description='Предупреждения.')
     async def warn(self, inter: disnake.ApplicationCommandInteraction, *, user: disnake.User, action: str = commands.Param(choices=['Выдать предупреждение', 'Убрать предупреждение']), count: int = None, reason: str = None):
         if action == 'Убрать предупреждение':
                 if count <= 0:
-                    m = disnake.Embed(title="<:loading:968523760753836092> Произошла ошибка!", description="Кажется, что-то пошло не по плану.", color=0xff6969)
+                    m = disnake.Embed(title="⚠️ Произошла ошибка!", description="Кажется, что-то пошло не по плану.", color=0xff6969)
                     m.add_field(name="От чего все проблемы?", value=f"```Вы указали отрицательное значение или ноль.```")
                     m.set_footer(text=random.choice(errors), icon_url=self.bot.user.avatar.url)
                     await inter.response.send_message(embed=m, ephemeral=True)
@@ -113,7 +115,7 @@ class ModernCog(commands.Cog):
                     warning_count = 0
 
                 if warning_count == 0:
-                    m1 = disnake.Embed(title="<:loading:968523760753836092> Произошла ошибка!", description="Произошла ошибка при исполнении команды.", color=0xff6969)
+                    m1 = disnake.Embed(title="⚠️ Произошла ошибка!", description="Произошла ошибка при исполнении команды.", color=0xff6969)
                     m1.add_field(name="От чего все проблемы?", value=f"```У пользователя нет предупреждений.```")
                     m1.set_footer(text=random.choice(errors), icon_url=self.bot.user.avatar.url)
                     await inter.response.send_message(embed=m1, ephemeral=True)
@@ -177,7 +179,7 @@ class ModernCog(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx, amount: int):
         if amount <= 0:
-            m1 = disnake.Embed(title="<:loading:968523760753836092> Произошла ошибка!", description="Произошла ошибка при исполнении команды.", color=0xff6969)
+            m1 = disnake.Embed(title="⚠️ Произошла ошибка!", description="Произошла ошибка при исполнении команды.", color=0xff6969)
             m1.add_field(name="От чего все проблемы?", value=f"```Вы указали отрицательное значение или ноль.```")
             m1.set_footer(text=random.choice(errors), icon_url=self.bot.user.avatar.url)
             await ctx.send(embed=m1)

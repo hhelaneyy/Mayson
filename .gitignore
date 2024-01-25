@@ -1,5 +1,7 @@
-/config.json
-/core
+*.json
+core
+__pycache__
+venv
+__pycache__
+*.bat
 *.db
-/venv
-/__pycache__

@@ -10,36 +10,38 @@ class ErrorsCog(commands.Cog):
     @commands.Cog.listener()
     @commands.is_owner()
     async def on_command_error(self, inter: disnake.ApplicationCommandInteraction, e):
-            #хули ты взрываешься?
             opp = None
             em = str(e)
             
             if isinstance(e, commands.CommandNotFound):
                 return
-            elif isinstance(e, commands.BotMissingPermissions):
+            elif isinstance(e, disnake.Forbidden):
+                missing_perms = e.missing_perms
+                missing_perms_names = [perm.replace('_', ' ').title() for perm in missing_perms]
+            
                 em = "Задание, которое вы мне дали, невыполнимо с моим количеством полномочий."
-                opp = "Эту задачку будет трудно решить без..."
-                a = "Дай, дай админку!"
+                opp = f"Эту задачку будет трудно решить без {missing_perms_names}"
+                a = "Мне нужно чтобы вы наделили меня правами."
             elif isinstance(e, commands.TooManyArguments):
                 em = "Задано слишком много аргументов для меня."
                 opp = "Кажется, в ваших зарпросах есть некоторая проблема."
-                a = "Мой мозг... он... lol = {property cogs}"
+                a = "Будь спокоен и пиши правильно."
             elif isinstance(e, commands.NotOwner):
                 em = "Кажется, вы не мой разработчик!"
-                opp = "Произошла ошибка при исполнении команды."
+                opp = "Возникла ошибка из-за недостатка прав."
                 a = "Не используй это."
             elif isinstance(e, commands.UserNotFound):
                 em = "Пользователь не найден!"
-                opp = "Произошла ошибка при исполнении команды."
-                a = "Напиши существующего человека))"
+                opp = "А кто указан-то?"
+                a = "Напишите существующего человека."
             elif isinstance(e, commands.MissingPermissions):
                 em = "У вас недостаточно прав, чтобы использовать это!"
-                opp = "Произошла ошибка при исполнении команды."
+                opp = "Возникла ошибка из-за недостатка прав."
                 a = "Вовращайся когда подрастёшь."
             elif isinstance(e, commands.MemberNotFound):
                 em = "Пользователь не найден."
                 opp = "Произошла ошибка при исполнении команды."
-                a = "Напиши существующего человека))"
+                a = "Напишите существующего человека."
             elif isinstance(e, commands.MissingRequiredArgument):
                 ma = str(e.param).split(":")[0]
                 command_name = inter.invoked_with
@@ -62,9 +64,7 @@ class ErrorsCog(commands.Cog):
     async def on_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, e):
             em = str(e)
 
-            if isinstance(e, commands.CommandNotFound):
-                pass
-            elif isinstance(e, commands.BotMissingPermissions):
+            if isinstance(e, commands.BotMissingPermissions):
                 em = "Задание, которое вы мне дали, невыполнимо с моим количеством полномочий."
                 d = "Эту задачку будет трудно решить без..."
                 a = "Дай, дай админку!"

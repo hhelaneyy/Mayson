@@ -4,7 +4,7 @@ import disnake
 from disnake.ext import commands, tasks
 import asyncio
 import random
-from core.embeds import errors, descriptions
+from core.utilities.embeds import errors, descriptions
 
 conn = sqlite3.connect('Mayson.db')
 cursor = conn.cursor()
@@ -246,7 +246,7 @@ class OwnerCog(commands.Cog):
                 await inter.response.send_message(embed=E)
             else:
                 E = disnake.Embed(color=0xff6969)
-                E.add_field(name='**Ошибка: **', value="Пользователь не найден в базе данных.")
+                E.add_field(name='**⚠️ Ошибка: **', value="Пользователь не найден в базе данных.")
                 E.set_footer(text="Убедитесь, что пользователь был добавлен.", icon_url=self.bot.user.avatar)
                 await inter.response.send_message(embed=E)
 
