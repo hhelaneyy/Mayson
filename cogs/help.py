@@ -18,7 +18,7 @@ class HelpCog(commands.Cog):
                     custom_commands.append(command)
         return custom_commands
 
-    def get_slash_commands(self, ignored_commands=['reload', 'blacklist', 'user-status']) -> List[disnake.ApplicationCommand]:
+    def get_slash_commands(self, ignored_commands=['reload', 'blacklist', 'user-status', 'global-warn']) -> List[disnake.ApplicationCommand]:
         custom_slash_commands = []
         for cmd in self.bot.slash_commands:
             if cmd.name not in ignored_commands:

@@ -36,24 +36,6 @@ class OwnerCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @tasks.loop(seconds=1)
-    async def status(self):
-        await self.bot.change_presence(status=disnake.Status.idle, activity=disnake.Activity(name="Сериалы для маленьких девочек", type=disnake.ActivityType.watching))
-        await asyncio.sleep(35)
-        await self.bot.change_presence(status=disnake.Status.idle, activity=disnake.Activity(name="", type=disnake.ActivityType.playing))
-        await asyncio.sleep(20)
-        await self.bot.change_presence(status=disnake.Status.idle, activity=disnake.Activity(name=f"с {self.bot.owner.name}", type=disnake.ActivityType.playing))
-        await asyncio.sleep(20)
-        await self.bot.change_presence(status=disnake.Status.idle, activity=disnake.Activity(name="Мир не справедлив.", type=disnake.ActivityType.watching))
-        await asyncio.sleep(20)
-
-    @status.before_loop
-    async def before_status(self):
-        await self.bot.wait_until_ready()
-
-    def cog_unload(self):
-        self.status.cancel()
-
     @commands.slash_command(name="reload", description="Коги взрыв.", guild_ids=[1171845365339783230])
     @commands.is_owner()
     async def reload(self, inter: disnake.ApplicationCommandInteraction, cog):
@@ -231,7 +213,7 @@ class OwnerCog(commands.Cog):
             E = disnake.Embed(color=0x740B0B)
             E.add_field(name='**Сервер: **', value=guild.name)
             E.add_field(name="**Пользователь: **", value=user.mention)
-            E.add_field(name="**Статус удалён**", value="Статус пользователя успешно удалён.")
+            E.add_field(name="**Изменение статуса:**", value="Статус пользователя успешно удалён.")
             E.set_footer(text="Теперь он обычный человек.", icon_url=self.bot.user.avatar)
             await inter.response.send_message(embed=E)
 
@@ -241,7 +223,7 @@ class OwnerCog(commands.Cog):
                 E = disnake.Embed(color=0x740B0B)
                 E.add_field(name='**Сервер: **', value=guild.name)
                 E.add_field(name="**Пользователь: **", value=user.mention)
-                E.add_field(name="**Статус изменён**", value=f"Новый статус: {status}")
+                E.add_field(name="**Изменение статуса:**", value=f"{status}")
                 E.set_footer(text="Обновите информацию о пользователе.", icon_url=self.bot.user.avatar)
                 await inter.response.send_message(embed=E)
             else:

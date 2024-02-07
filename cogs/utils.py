@@ -3,7 +3,6 @@ import random
 import disnake
 from disnake.ext import commands
 from datetime import datetime
-import time
 import platform
 from disnake import ui
 from typing import List
@@ -20,8 +19,6 @@ cursor.execute('''
         age INTEGER
     )
 ''')
-
-# Сохраняем изменения в базе данных
 conn.commit()
 
 class MyBot(commands.Bot):
@@ -42,9 +39,9 @@ class UtilsCog(commands.Cog):
         await inter.response.defer()
         translator = Translator()
         translation = translator.translate(phrase, dest=lang)
-        emb = disnake.Embed(title=f"✅ Перевод выполнен! [ {phrase} ]", description=f"Спасибо, что воспользовались моими услугами переводчика)", color=disnake.Color.random())
+        emb = disnake.Embed(title=f"✅ Перевод выполнен! [ {phrase} ]", description=f"Спасибо, что воспользовались моими услугами переводчика.", color=disnake.Color.random())
         emb.add_field(name='Ваш перевод:', value=f'```{translation.text}```')
-        emb.set_footer(text="Molzy Production", icon_url=inter.bot.user.avatar)
+        emb.set_footer(text=random.choice(descriptions), icon_url=inter.bot.user.avatar)
         await inter.followup.send(embed = emb)
 
     @commands.command(name="stats", description='Статистика моя.')
@@ -64,7 +61,7 @@ class UtilsCog(commands.Cog):
             about_bot = (
                 f"🧊 | Язык программирования: __**Python {platform.python_version()}**__",
                 f"💽 | Платформа: __**{platform.platform()}**__",
-                f'🔄️ | Версия обновления: __**Бета 2.0.1**__',
+                f'🔄️ | Версия обновления: __**Бета 2.1**__',
                 f"🔖 | Статус: __**В разработке...**__",
                 f"🏂🏻 | Задержка: __**{round(self.bot.latency * float(1000))}мс.**__",
             )
@@ -88,6 +85,7 @@ class UtilsCog(commands.Cog):
     async def server(self, inter: disnake.ApplicationCommandInteraction):
             guild = inter.guild
             author = inter.author
+            rule_channel = guild.rules_channel.mention
             region = inter.guild.preferred_locale
             members = inter.guild.member_count
             mfa_lvl = inter.guild.mfa_level
@@ -130,10 +128,11 @@ class UtilsCog(commands.Cog):
 
             channels_and_boosts = (
                 f'Прогресс Бар: **{boost_progress}**',
-                f'Поддержавших: **{boosters or "Бустеров нет?(("}**',
+                f'Поддержавших: **{boosters or "Поддерживающих нет."}**',
                 f'Уровень поддержки: **{boost_tier}**',
                 f'---------------------------------',
                 f'Всего каналов: **{channels}**',
+                f'Канал правил: **{rule_channel or "Канала правил нет на сервере."}**',
                 f'Текстовых каналов: **{text_channels}**',
                 f'Голосовых каналов: **{voice_channels}**',
             )
@@ -151,8 +150,13 @@ class UtilsCog(commands.Cog):
             emb.add_field(name="> Роли:", value='\n'.join(roles), inline=False)
             emb.add_field(name="> Каналы и Бусты:", value='\n'.join(channels_and_boosts), inline=False)
             emb.add_field(name="> Прочее:", value='\n'.join(other), inline=False)
-            emb.set_thumbnail(url=guild.icon)
 
+            if guild.banner:
+                emb.set_image(url=guild.banner)
+            else:
+                pass
+            
+            emb.set_thumbnail(url=guild.icon)
             await inter.response.send_message(embed = emb)
 
     def get_forbidden_users(self):
@@ -186,6 +190,13 @@ class UtilsCog(commands.Cog):
         else:
             user_status = "Пользователь"
 
+        cursor.execute('SELECT warning_count FROM global_warns WHERE user_id = ?', (user.id,))
+        row = cursor.fetchone()
+        if row:
+            gl_count = row[0]
+        else:
+            gl_count = '0'
+
         is_forbidden = self.is_user_forbidden(user.id)
         forbidden_status = "Да" if is_forbidden else "Нет"
 
@@ -197,7 +208,7 @@ class UtilsCog(commands.Cog):
 
         user_info = (
             f'**🌍  |  Работоспособен: {created_at_indicator}**',
-            f'**⚠️  |  Предупреждения: __???__**',
+            f'**⚠️  |  Глобальные предупреждения: __{gl_count}__**',
             f'**🚫  |  В черном списке: __{forbidden_status}__**',
         )
 
@@ -217,6 +228,7 @@ class UtilsCog(commands.Cog):
     @commands.command(description="Информация об участнике сервера.")
     async def profile(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member | disnake.User = None):
         author = inter.author
+        activity = 'Активность отсутствует.'
         if user is None:
             user = inter.author
 
@@ -227,7 +239,18 @@ class UtilsCog(commands.Cog):
             await inter.send(embed=m1)
             return
         
-        # Ищу пользователя, чтобы вывести его баннер
+        if user.activity:
+            if user.activity.type == disnake.ActivityType.playing:
+                activity = f"🎮 Играет в {user.activity.name}"
+            elif user.activity.type == disnake.ActivityType.streaming:
+                activity = f"📟 Стримит {user.activity.name}"
+            elif user.activity.type == disnake.ActivityType.listening:
+                activity = f"🎧 Слушает {user.activity.name}"
+            elif user.activity.type == disnake.ActivityType.watching:
+                activity = f"👁️ Смотрит {user.activity.name}"
+            else:
+                activity = user.activity
+        
         banner = await self.bot.fetch_user(user.id)
 
         created_at_indicator = f'<t:{int(user.created_at.timestamp())}:F>'
@@ -293,7 +316,7 @@ class UtilsCog(commands.Cog):
 
             view.bot = self.bot
 
-        emb = disnake.Embed(description=user.activity or 'Активность отсутвует.', color=disnake.Color.random())
+        emb = disnake.Embed(description=activity, color=disnake.Color.random())
         emb.add_field(name="> Общая информация", value='\n'.join(all_info), inline=False)
         emb.add_field(name="> Информация об участнике", value='\n'.join(user_info), inline=False)
         emb.add_field(name="> Прочая информация", value='\n'.join(other_info), inline=False)

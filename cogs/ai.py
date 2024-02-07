@@ -63,7 +63,7 @@ class OpenaiCog(commands.Cog):
                 #await inter.followup.send(embed=embed)
 
     def is_user_forbidden(self, user_id):
-        connection = sqlite3.connect('Molzy.db')
+        connection = sqlite3.connect('Mayson.db')
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM forbidden_users WHERE user_id = ?", (user_id,))
         forbidden_user = cursor.fetchone()

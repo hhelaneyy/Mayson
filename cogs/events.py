@@ -1,18 +1,38 @@
+import asyncio
+import random
 import disnake
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 
 class EventsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.status.start()
 
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild: disnake.Guild):
-        for channel in guild.text_channels:
-            if "чат" in channel.name.lower() or "chat" in channel.name.lower() or 'hang' in channel.name.lower() or 'основной' in channel.name.lower() or '' in channel.name.lower():
-                emb = disnake.Embed(title="Привет-привет!", description="Спасибо что пригласили меня на ваш чудесный сервер! Меня зовут Molzy - и я ваша виртуальная ассистентка! Я могу разнообразить ваш сервер весёлыми командами, которые у меня имеются! Используйте `ml.help` чтобы узнать список моих команд и используйте их. Также, меня наделили технологией OpenAI, благодаря чему я могу помогать вам при помощи искуственного интелекта. \nНадеюсь мы с вами станем лучшими друзьями!", color=disnake.Color.blurple())
-                emb.set_thumbnail(url=self.bot.user.avatar.url)
-                emb.set_footer(text="Начнём же знакомство!", icon_url=self.bot.user.avatar)
-                await channel.send(embed=emb)
+    @tasks.loop(seconds=1)
+    async def status(self):
+        all_members = []
+        for guild in self.bot.guilds:
+            all_members.extend(guild.members)
+
+        if all_members:
+            random_member = random.choice(all_members)
+            random_username = random_member.name
+            
+            await self.bot.change_presence(status=disnake.Status.idle, activity=disnake.Activity(name=f'на {random_username}', type=disnake.ActivityType.watching))
+        await asyncio.sleep(15)
+        await self.bot.change_presence(status=disnake.Status.idle, activity=disnake.Activity(name="🤨🤨🤨", type=disnake.ActivityType.playing))
+        await asyncio.sleep(15)
+        await self.bot.change_presence(status=disnake.Status.idle, activity=disnake.Activity(name=f"Poker Night", type=disnake.ActivityType.playing))
+        await asyncio.sleep(15)
+        await self.bot.change_presence(status=disnake.Status.idle, activity=disnake.Activity(name="SCP-1576.", type=disnake.ActivityType.listening))
+        await asyncio.sleep(15)
+
+    @status.before_loop
+    async def before_status(self):
+        await self.bot.wait_until_ready()
+
+    def cog_unload(self):
+        self.status.cancel()
 
 def setup(bot: commands.Bot):
     bot.add_cog(EventsCog(bot))
