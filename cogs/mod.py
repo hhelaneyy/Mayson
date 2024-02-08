@@ -175,23 +175,23 @@ class ModernCog(commands.Cog):
         else:
             warning_count = 'Предупреждений нет.'
 
-    @commands.slash_command(description="Очищу всё до единого!")
+    @commands.slash_command(description="Очищу всё до единого.")
     @commands.has_permissions(manage_messages=True)
-    async def clear(self, ctx, amount: int):
+    async def clear(self, inter: disnake.ApplicationCommandInteraction, amount: int):
         if amount <= 0:
             m1 = disnake.Embed(title="⚠️ Произошла ошибка!", description="Произошла ошибка при исполнении команды.", color=0xff6969)
             m1.add_field(name="От чего все проблемы?", value=f"```Вы указали отрицательное значение или ноль.```")
             m1.set_footer(text=random.choice(errors), icon_url=self.bot.user.avatar.url)
-            await ctx.send(embed=m1)
+            await inter.response.send_message(embed=m1)
             return
-        messages = await ctx.channel.history(limit=amount + 1).flatten()
-        messages = [msg for msg in messages if msg.id != ctx.id]
-        await ctx.channel.delete_messages(messages)
+        messages = await inter.channel.history(limit=amount).flatten()
+        messages = [msg for msg in messages if msg.id != inter.id]
+        await inter.channel.delete_messages(messages)
         
-        embed = disnake.Embed(title="✅ Чат очищен!", description=f"Было удалено **{amount}** сообщение(-я; -ий)!", color=0x50c878)
-        author = ctx.author
-        embed.set_footer(text=f"Спасибо за очистку, {author.name}!", icon_url=author.avatar.url)
-        await ctx.send(embed=embed)
+        embed = disnake.Embed(title="✅ Чат очищен!", description=f"Было удалено **{amount}** сообщение(-я; -ий).", color=0x50c878)
+        author = inter.author
+        embed.set_footer(text=f"Спасибо за очистку, {author.name}.", icon_url=author.avatar.url)
+        await inter.response.send_message(embed=embed, ephemeral=True)
 
 def setup(bot: commands.Bot):
     bot.add_cog(ModernCog(bot))
