@@ -3,6 +3,7 @@ import sqlite3
 import disnake
 from disnake.ext import commands, tasks
 import asyncio
+import os
 import random
 from core.utilities.embeds import errors, descriptions
 
@@ -39,8 +40,8 @@ class OwnerCog(commands.Cog):
     @commands.slash_command(name="reload", description="Коги взрыв.", guild_ids=[1171845365339783230])
     @commands.is_owner()
     async def reload(self, inter: disnake.ApplicationCommandInteraction, cog):
-            self.bot.reload_extension("cogs."+cog)
-            await inter.response.send_message("Ког перезагружен!", ephemeral=True)
+        self.bot.reload_extension("cogs."+cog)
+        await inter.response.send_message("Ког перезагружен.", ephemeral=True)
 
     @commands.slash_command(name='global-warn', description='Глобальные предупреждения.', guild_ids=[1171845365339783230])
     @commands.is_owner()
@@ -132,13 +133,6 @@ class OwnerCog(commands.Cog):
                     m.add_field(name="Что же не так?", value=f"```Господин Helaney, вы не можете занести эту госпожу в Чёрный Список.```")
                     m.set_footer(text=f"{random.choice(errors)} ∙ {timestamp.strftime('%d %b %Y')}", icon_url=self.bot.user.avatar.url)
                     await inter.response.send_message(embed=m, ephemeral=True)
-                    
-                elif user.id == self.bot.owner.id:
-                    m = disnake.Embed(title="⚠️ Произошла ошибка!", description="Кажется, пользователем был указан кто-то знакомый...", color=0xff6969)
-                    m.add_field(name="Что же не так?", value=f"```Господин Helaney, вы не можете занести себя в Чёрный Список.```")
-                    m.set_footer(text=f"{random.choice(errors)} ∙ {timestamp.strftime('%d %b %Y')}", icon_url=self.bot.user.avatar.url)
-                    await inter.response.send_message(embed=m, ephemeral=True)
-                    return
 
                 if not self.is_user_forbidden(user.id):
                     self.add_forbidden_user(user.id)

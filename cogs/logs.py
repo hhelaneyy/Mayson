@@ -83,5 +83,30 @@ class LogsCog(commands.Cog):
 
             await log_channel.send(embed=embed)
 
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild, user):
+        log_channel = self.get_log_channel(guild)
+        created_at_indicator = f'<t:{int(user.created_at.timestamp())}:F>'
+        if log_channel:
+            embed = disnake.Embed(title="🛑 Участник заблокирован.", description=f"Сервер зафиксировал, что кто-то был забанен..", color=disnake.Color.gold())
+            embed.add_field(name="Никнейм участник:", value=f'{user.mention}')
+            embed.add_field(name='Дата регистрации:', value=created_at_indicator)
+            embed.add_field(name='Причина:', value='???')
+            embed.set_thumbnail(url=user.avatar)
+            embed.set_footer(text=random.choice(descriptions), icon_url=guild.icon)
+            await log_channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_member_unban(self, guild, user):
+        log_channel = self.get_log_channel(guild)
+        created_at_indicator = f'<t:{int(user.created_at.timestamp())}:F>'
+        if log_channel:
+            embed = disnake.Embed(title="✅ Участник разблокирован.", description=f"Сервер зафиксировал, что кто-то был разбанен.", color=disnake.Color.gold())
+            embed.add_field(name="Никнейм участник:", value=f'{user.mention}')
+            embed.add_field(name='Дата регистрации:', value=created_at_indicator)
+            embed.set_thumbnail(url=user.avatar)
+            embed.set_footer(text=random.choice(descriptions), icon_url=guild.icon)
+            await log_channel.send(embed=embed)
+
 def setup(bot: commands.Bot):
     bot.add_cog(LogsCog(bot))

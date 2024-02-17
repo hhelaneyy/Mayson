@@ -1,4 +1,5 @@
 import random
+import sqlite3
 import disnake
 from disnake.ext import commands
 from datetime import datetime
@@ -8,6 +9,14 @@ class ErrorsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
+    def is_user_forbidden(self, user_id):
+        connection = sqlite3.connect('Mayson.db')
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM forbidden_users WHERE user_id = ?", (user_id,))
+        forbidden_user = cursor.fetchone()
+        connection.close()
+        return forbidden_user is not None
+
     @commands.Cog.listener()
     async def on_command_error(self, inter: disnake.ApplicationCommandInteraction, e):
             opp = None
@@ -15,6 +24,9 @@ class ErrorsCog(commands.Cog):
             
             if isinstance(e, commands.CommandNotFound):
                 return
+            elif isinstance(e, self.is_user_forbidden):
+                em = 'Вы слишком подозрительная личность.'
+                opp = f'Вы были занесены в Чёрный Список бота Mayson. Если у вас есть вопросы по поводу вашей блокировки, обратитесь к {self.bot.owner.mention}'
             elif isinstance(e, commands.CommandInvokeError):
                 em = "Задание, которое вы мне дали, невыполнимо с моим количеством полномочий."
                 opp = f"Эту задачку будет трудно решить без требуемых команде прав."
@@ -52,10 +64,7 @@ class ErrorsCog(commands.Cog):
     async def on_slash_command_error(self, inter: disnake.ApplicationCommandInteraction, e):
             em = str(e)
 
-            if isinstance(e, commands.CommandInvokeError):
-                em = "Задание, которое вы мне дали, невыполнимо с моим количеством полномочий."
-                d = f"Эту задачку будет трудно решить без нужных для команды прав."
-            elif isinstance(e, commands.NotOwner):
+            if isinstance(e, commands.NotOwner):
                 em = "Кажется, вы не мой разработчик!"
                 d = "Произошла ошибка при исполнении команды."
             elif isinstance(e, commands.MissingRequiredArgument):

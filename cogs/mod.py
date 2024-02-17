@@ -161,7 +161,7 @@ class ModernCog(commands.Cog):
 
                 wm = disnake.Embed(color=0x740B0B)
                 wm.add_field(name="**Сервер:**", value=inter.guild.name)
-                wm.add_field(name="    **Администратор:**", value=author.mention)
+                wm.add_field(name="    **Инициатор:**", value=author.mention)
                 wm.add_field(name="    **Нарушитель:**", value=user.name)
                 wm.add_field(name="    **Причина предупреждения:**", value=f"{reason or 'Причина не указана.'}", inline=False)
                 wm.add_field(name="    **Количество предупреждений:**", value=warning_count, inline=False)
@@ -184,11 +184,18 @@ class ModernCog(commands.Cog):
             m1.set_footer(text=random.choice(errors), icon_url=self.bot.user.avatar.url)
             await inter.response.send_message(embed=m1)
             return
+        elif amount >= 50:
+            m1 = disnake.Embed(title="⚠️ Произошла ошибка!", description="Произошла ошибка при исполнении команды.", color=0xff6969)
+            m1.add_field(name="От чего все проблемы?", value=f"```Вы указали отрицательное значение или ноль.```")
+            m1.set_footer(text=random.choice(errors), icon_url=self.bot.user.avatar.url)
+            await inter.response.send_message(embed=m1)
+            return
+        
         messages = await inter.channel.history(limit=amount).flatten()
         messages = [msg for msg in messages if msg.id != inter.id]
         await inter.channel.delete_messages(messages)
         
-        embed = disnake.Embed(title="✅ Чат очищен!", description=f"Было удалено **{amount}** сообщение(-я; -ий).", color=0x50c878)
+        embed = disnake.Embed(title="✅ Чат очищен!", description=f"Удалено **{amount}** сообщение(-я; -ий).", color=0x50c878)
         author = inter.author
         embed.set_footer(text=f"Спасибо за очистку, {author.name}.", icon_url=author.avatar.url)
         await inter.response.send_message(embed=embed, ephemeral=True)

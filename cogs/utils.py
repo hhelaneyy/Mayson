@@ -128,7 +128,7 @@ class UtilsCog(commands.Cog):
 
             channels_and_boosts = (
                 f'Прогресс Бар: **{boost_progress}**',
-                f'Поддержавших: **{boosters or "Поддерживающих нет."}**',
+                f'Поддержавших: **{boosters or "Поддержавших нет."}**',
                 f'Уровень поддержки: **{boost_tier}**',
                 f'---------------------------------',
                 f'Всего каналов: **{channels}**',
