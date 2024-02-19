@@ -1,15 +1,18 @@
 import asyncio
 import os
+import sqlite3
 import sys
 import time
 import disnake
 from disnake.ext import commands
 import json
+import openai
 
 with open('config.json') as f:
     data = json.load(f)
     token = data["token"]
     prefix = data["prefix"]
+    openai.api_key = data['gpt_token']
 
 intents = disnake.Intents.all()
 bot = commands.Bot(command_prefix=prefix, help_command=None, intents=intents)
