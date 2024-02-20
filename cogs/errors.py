@@ -2,20 +2,13 @@ import random
 import sqlite3
 import disnake
 from disnake.ext import commands
+from disnake.errors import Forbidden
 from datetime import datetime
 from core.utilities.embeds import errors
 
 class ErrorsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-
-    def is_user_forbidden(self, user_id):
-        connection = sqlite3.connect('Mayson.db')
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM forbidden_users WHERE user_id = ?", (user_id,))
-        forbidden_user = cursor.fetchone()
-        connection.close()
-        return forbidden_user is not None
 
     @commands.Cog.listener()
     async def on_command_error(self, inter: disnake.ApplicationCommandInteraction, e):
@@ -24,12 +17,12 @@ class ErrorsCog(commands.Cog):
             
             if isinstance(e, commands.CommandNotFound):
                 return
-            elif isinstance(e, self.is_user_forbidden):
-                em = 'Вы слишком подозрительная личность.'
-                opp = f'Вы были занесены в Чёрный Список бота Mayson. Если у вас есть вопросы по поводу вашей блокировки, обратитесь к {self.bot.owner.mention}'
             elif isinstance(e, commands.CommandInvokeError):
                 em = "Задание, которое вы мне дали, невыполнимо с моим количеством полномочий."
                 opp = f"Эту задачку будет трудно решить без требуемых команде прав."
+            elif isinstance(e, commands.TooManyArguments):
+                em = "Задано слишком много аргументов для меня."
+                opp = "Кажется, в ваших запросах есть некоторая проблема."
             elif isinstance(e, commands.TooManyArguments):
                 em = "Задано слишком много аргументов для меня."
                 opp = "Кажется, в ваших зарпросах есть некоторая проблема."

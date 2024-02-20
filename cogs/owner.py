@@ -74,43 +74,68 @@ class OwnerCog(commands.Cog):
                 await ctx.send(embed=E2)
 
                 if new_warning_count == 1:
-                    E1 = disnake.Embed(title='Вам было выдано глобальное предупреждение.', color=disnake.Color.red())
-                    E1.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
-                    E1.add_field(name='Причина:', value=reason or 'Причина не была указана разработчиком/менеджером.')
-                    E1.add_field(name='Ваше кол-во предупреждений:', value=new_warning_count)
-                    E1.add_field(name='Комментарий разработчика/менеджера:', value='```Глобальное предупреждение выдаётся навсегда за нарушение политики пользования ботом Mayson. Если вы соберёте 3 варна, то будете перманентно заблокированы в боте и не сможете использовать его команды. С уважением, Mayson Dev. Community.```', inline=False)
-                    await user.send(embed=E1)
+                    try:
+                        E1 = disnake.Embed(title='Вам было выдано глобальное предупреждение.', color=disnake.Color.red())
+                        E1.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
+                        E1.add_field(name='Причина:', value=reason or 'Причина не была указана разработчиком/менеджером.')
+                        E1.add_field(name='Ваше кол-во предупреждений:', value=new_warning_count)
+                        E1.add_field(name='Комментарий разработчика/менеджера:', value='```Глобальное предупреждение выдаётся навсегда за нарушение политики пользования ботом Mayson. Если вы соберёте 3 варна, то будете перманентно заблокированы в боте и не сможете использовать его команды. С уважением, Mayson Dev. Community.```', inline=False)
+                        await user.send(embed=E1)
+                    except:
+                        pass
 
                 elif new_warning_count == 2:
-                    E1 = disnake.Embed(title='Вам было выдано глобальное предупреждение.', color=disnake.Color.red())
-                    E1.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
-                    E1.add_field(name='Причина:', value=reason or 'Причина не была указана разработчиком/менеджером.')
-                    E1.add_field(name='Ваше кол-во предупреждений:', value=new_warning_count)
-                    E1.add_field(name='Комментарий разработчика/менеджера:', value='```Вы вновь получили предупреждение за нарушение политики пользования ботом Mayson. В следующий раз, если вы получите предупреждение, вы будете занесены в чёрный список.```', inline=False)
-                    await user.send(embed=E1)
+                    try:
+                        E1 = disnake.Embed(title='Вам было выдано глобальное предупреждение.', color=disnake.Color.red())
+                        E1.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
+                        E1.add_field(name='Причина:', value=reason or 'Причина не была указана разработчиком/менеджером.')
+                        E1.add_field(name='Ваше кол-во предупреждений:', value=new_warning_count)
+                        E1.add_field(name='Комментарий разработчика/менеджера:', value='```Вы вновь получили предупреждение за нарушение политики пользования ботом Mayson. В следующий раз, если вы получите предупреждение, вы будете занесены в чёрный список.```', inline=False)
+                        await user.send(embed=E1)
+                    except:
+                        pass
 
                 elif new_warning_count == 3:
-                    E1 = disnake.Embed(title='Вам было выдано глобальное предупреждение.', color=disnake.Color.red())
-                    E1.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
-                    E1.add_field(name='Причина:', value=reason or 'Причина не была указана разработчиком/менеджером.')
-                    E1.add_field(name='Ваше кол-во предупреждений:', value=new_warning_count)
-                    E1.add_field(name='Комментарий разработчика/менеджера:', value='```Вы получили 3/3 глобальных предупреждений и вам будет будет ограничен доступ к некоторым командам.```', inline=False)
-                    await user.send(embed=E1)
+                    try:
+                        E1 = disnake.Embed(title='Вам было выдано глобальное предупреждение.', color=disnake.Color.red())
+                        E1.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
+                        E1.add_field(name='Причина:', value=reason or 'Причина не была указана разработчиком/менеджером.')
+                        E1.add_field(name='Ваше кол-во предупреждений:', value=new_warning_count)
+                        E1.add_field(name='Комментарий разработчика/менеджера:', value='```Вы получили 3/3 глобальных предупреждений и вам будет будет ограничен доступ к некоторым командам.```', inline=False)
+                        await user.send(embed=E1)
+                    except:
+                        pass
 
             elif action == 'Убрать глобальное предупреждение':
                 if user_warnings and user_warnings[0] > 0:
                     new_warning_count = max(user_warnings[0] - (count or 0), 0)
                     cursor.execute('UPDATE global_warns SET warning_count = ? WHERE user_id = ?', (new_warning_count, user.id))
                     conn.commit()
+
                     E = disnake.Embed(title='Удаление глобальных предупреждений.', color=disnake.Color.green())
                     E.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
                     E.add_field(name='**Пользователь:**', value=user.name)
                     E.add_field(name='**Количество глобальных предупреждений:**', value=new_warning_count if new_warning_count else '0', inline=False)
                     await ctx.send(embed=E)
+
+                    E1 = disnake.Embed(title='У вас было удалено глобальное предупреждение.', color=disnake.Color.red())
+                    E1.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
+                    E1.add_field(name='Ваше кол-во предупреждений:', value=new_warning_count)
+                    E1.add_field(name='Комментарий разработчика/менеджера:', value='```Сорян братан, случайно выдал варн. Да и вообще иди ты нахуй. С уважением, Mayson Hub.```', inline=False)
+                    await user.send(embed=E1)
                 else:
                     Edd = disnake.Embed(title='⚠️ Произошла ошибка.', color=disnake.Color.yellow())
                     Edd.add_field(name='Что же не так?', value='```У пользователя нет предупреждений.```')
                     await ctx.send(embed=Edd)
+
+                try:
+                    E1 = disnake.Embed(title='У вас было удалено глобальное предупреждение.', color=disnake.Color.red())
+                    E1.add_field(name='**Разработчик/Менеджер:**', value=ctx.author.mention)
+                    E1.add_field(name='Ваше кол-во предупреждений:', value=new_warning_count)
+                    E1.add_field(name='Комментарий разработчика/менеджера:', value='```Сорян братан, случайно выдал варн. Да и вообще иди ты нахуй. С уважением, Mayson Hub.```', inline=False)
+                    await user.send(embed=E1)
+                except:
+                    pass
 
     def add_forbidden_user(self, user_id):
         connection = sqlite3.connect('Mayson.db')

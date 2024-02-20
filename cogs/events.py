@@ -1,5 +1,6 @@
 import asyncio
 import random
+import sqlite3
 import disnake
 from disnake.ext import commands, tasks
 
@@ -7,6 +8,14 @@ class EventsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.status.start()
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild: disnake.Guild):
+        audit = guild.system_channel
+
+        E = disnake.Embed(title='🌌 Вот я и прибыл на ваш сервер.', description='Я рад, что вы пригласили меня на вашу вечеринку. Теперь, я стану вашим виртуальным ассистентом, который сможет разнообразить ваш сервер новыми различными командами. Вы также можете использовать `mn.help` чтобы узнать какими командами я обладаю. \n\nЕсли у вас возникнут вопросы во время моего использования, не стесняйтесь задавать их на [официальном сервере разработки и технической поддержки](https://discord.gg/MVWBybpf), мы всегда на связи и готовы помочь вам.', color=0x6b80e7)
+        E.set_footer(text='Mayson Hub. Все права были защищены.', icon_url=self.bot.user.avatar)
+        await audit.send(embed=E)
 
     @tasks.loop(seconds=1)
     async def status(self):
