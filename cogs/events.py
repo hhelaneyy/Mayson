@@ -9,13 +9,41 @@ class EventsCog(commands.Cog):
         self.bot = bot
         self.status.start()
 
+    def is_user_forbidden(self, user_id):
+        connection = sqlite3.connect('Mayson.db')
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM forbidden_users WHERE user_id = ?", (user_id,))
+        forbidden_user = cursor.fetchone()
+        connection.close()
+        return forbidden_user is not None
+    
+    async def check_forbidden_users(self):
+        for guild in self.bot.guilds:
+            creator_id = guild.owner_id
+            if self.is_user_forbidden(creator_id):
+                await guild.leave()
+    
+    async def background_task(self):
+        while True:
+            await self.check_forbidden_users()
+            await asyncio.sleep(3600)
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.bot.loop.create_task(self.background_task())
+
     @commands.Cog.listener()
     async def on_guild_join(self, guild: disnake.Guild):
         audit = guild.system_channel
+        owner = guild.owner_id
 
-        E = disnake.Embed(title='🌌 Вот я и прибыл на ваш сервер.', description='Я рад, что вы пригласили меня на вашу вечеринку. Теперь, я стану вашим виртуальным ассистентом, который сможет разнообразить ваш сервер новыми различными командами. Вы также можете использовать `mn.help` чтобы узнать какими командами я обладаю. \n\nЕсли у вас возникнут вопросы во время моего использования, не стесняйтесь задавать их на [официальном сервере разработки и технической поддержки](https://discord.gg/MVWBybpf), мы всегда на связи и готовы помочь вам.', color=0x6b80e7)
-        E.set_footer(text='Mayson Hub. Все права были защищены.', icon_url=self.bot.user.avatar)
-        await audit.send(embed=E)
+        if self.is_user_forbidden(owner):
+            await guild.leave()
+            return
+        else:
+            E = disnake.Embed(title='🌌 Вот я и прибыл на ваш сервер.', description='Я рад, что вы пригласили меня на вашу вечеринку. Теперь, я стану вашим виртуальным ассистентом, который сможет разнообразить ваш сервер новыми различными командами. Вы также можете использовать `mn.help` чтобы узнать какими командами я обладаю. \n\nЕсли у вас возникнут вопросы во время моего использования, не стесняйтесь задавать их на [официальном сервере разработки и технической поддержки](https://discord.gg/MVWBybpf), мы всегда на связи и готовы помочь вам.', color=0x6b80e7)
+            E.set_footer(text='Mayson Hub. Все права были защищены.', icon_url=self.bot.user.avatar)
+            await audit.send(embed=E)
 
     @tasks.loop(seconds=1)
     async def status(self):
